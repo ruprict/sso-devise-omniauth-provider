@@ -1,14 +1,14 @@
 class AuthController < ApplicationController
-  before_filter :authenticate_user!, :except => [:access_token]
+  before_filter :authenticate_account!, :except => [:access_token, :user]
   skip_before_filter :verify_authenticity_token, :only => [:access_token]
 
   def welcome
-    render :text => "Hiya! #{current_user.first_name} #{current_user.last_name}"
+    render :text => "Hiya! #{current_account.first_name} #{current_account.last_name}"
   end
 
   def authorize
     AccessGrant.prune!
-    access_grant = current_user.access_grants.create({:client => application, :state => params[:state]}, :without_protection => true)
+    access_grant = current_account.access_grants.create({:client => application, :state => params[:state]}, :without_protection => true)
     redirect_to access_grant.redirect_uri_for(params[:redirect_uri])
   end
 
@@ -35,18 +35,24 @@ class AuthController < ApplicationController
   end
 
   def user
+    oauth_token = params[:oauth_token]
+    ag = AccessGrant.where(access_token: oauth_token).first
+    logger.info "AccessGrant: #{ag.inspect}"
+    render text: "Unauthorized", status: 401 and return unless ag.present?
+    account = ag.account
+    
     hash = {
-      :provider => 'josh_id',
-      :id => current_user.id.to_s,
+      :provider => 'kyck_auth',
+      :id => account.id.to_s,
       :info => {
-         :email      => current_user.email,
+         :email      => account.email,
       },
       :extra => {
-         :first_name => current_user.first_name,
-         :last_name  => current_user.last_name
+         :first_name => account.first_name,
+         :last_name  => account.last_name
       }
     }
-
+    logger.info "** Rendering #{hash.inspect}"
     render :json => hash.to_json
   end
 
@@ -54,7 +60,7 @@ class AuthController < ApplicationController
   # This will be called ONLY if the user is authenticated and token is valid
   # Extend the UserManager session
   def isalive
-    warden.set_user(current_user, :scope => :user)
+    warden.set_user(current_account, :scope => :account)
     response = { 'status' => 'ok' }
 
     respond_to do |format|

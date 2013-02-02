@@ -1,13 +1,13 @@
-class User < ActiveRecord::Base
+class Account < ActiveRecord::Base
   has_many :authentications, :dependent => :delete_all
   has_many :access_grants, :dependent => :delete_all
 
   before_validation :initialize_fields, :on => :create
 
-  devise :database_authenticatable, :registerable, :token_authenticatable,
-         :recoverable, :timeoutable, :trackable, :validatable, :rememberable
+  devise :database_authenticatable,:recoverable, :validatable, :rememberable, :omniauthable
+  # :trackable,:registerable, :token_authenticatable,:timeoutable,
 
-  self.token_authentication_key = "oauth_token"
+  #self.token_authentication_key = "kcyk_oauth_token"
 
   attr_accessible :email, :password, :password_confirmation, :remember_me, :first_name, :last_name
 
@@ -16,7 +16,8 @@ class User < ActiveRecord::Base
   end
 
   def self.find_for_token_authentication(conditions)
-    where(["access_grants.access_token = ? AND (access_grants.access_token_expires_at IS NULL OR access_grants.access_token_expires_at > ?)", conditions[token_authentication_key], Time.now]).joins(:access_grants).select("users.*").first
+    Rails.logger.info "****************BUICK"
+    where(["access_grants.access_token = ? AND (access_grants.access_token_expires_at IS NULL OR access_grants.access_token_expires_at > ?)", conditions[token_authentication_key], Time.now]).joins(:access_grants).select("accounts.*").first
   end
   
   def initialize_fields

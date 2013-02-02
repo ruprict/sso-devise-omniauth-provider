@@ -1,7 +1,7 @@
 class AccessGrant < ActiveRecord::Base
-  belongs_to :user
   belongs_to :client
   before_create :generate_tokens
+  belongs_to :account
 
 
   def self.prune!

@@ -1,5 +1,5 @@
 ClientApplication.delete_all
-User.delete_all
+Account.delete_all
 
 ClientApplication.create(
   :name => "secret",
@@ -7,9 +7,9 @@ ClientApplication.create(
   :app_secret => "demo_secret"
 )
 
-User.create(
+Account.create(
   :username => "demo",
-  :password_hash => User.hash_password("password", "salt"),
+  :password_hash => Account.hash_password("password", "salt"),
   :password_salt => "salt",
   :status => "Active",
   :expiration_date => "2020-01-01"
