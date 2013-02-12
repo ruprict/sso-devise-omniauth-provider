@@ -1,14 +1,17 @@
 OauthProviderDemo::Application.routes.draw do
   devise_for :accounts, :controllers => { :registrations => 'registrations',
                                        :sessions => 'sessions'}
+
+  resources :authentications 
   # omniauth client stuff
-  match '/auth/:provider/callback', :to => 'authentications#create'
-  match '/auth/failure', :to => 'authentications#failure'
+  match '/accounts/auth/:provider/callback', :to => 'authentications#create'
+  match '/accounts/auth/failure', :to => 'authentications#failure'
+
 
   # Provider stuff
-  match '/auth/kyck_auth/authorize' => 'auth#authorize'
-  match '/auth/kyck_auth/access_token' => 'auth#access_token'
-  match '/auth/kyck_auth/user' => 'auth#user'
+  match '/authorize' => 'auth#authorize'
+  match '/access_token' => 'auth#access_token'
+  match '/auth/user' => 'auth#user'
   match '/oauth/token' => 'auth#access_token'
 
 

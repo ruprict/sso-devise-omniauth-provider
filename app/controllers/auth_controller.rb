@@ -1,9 +1,8 @@
 class AuthController < ApplicationController
-  before_filter :authenticate_account!, :except => [:access_token, :user]
+  before_filter :authenticate_account!, :except => [:access_token]
   skip_before_filter :verify_authenticity_token, :only => [:access_token]
 
   def welcome
-    render :text => "Hiya! #{current_account.first_name} #{current_account.last_name}"
   end
 
   def authorize
@@ -27,6 +26,7 @@ class AuthController < ApplicationController
     end
 
     access_grant.start_expiry_period!
+    session[:token] = access_grant.access_token
     render :json => {:access_token => access_grant.access_token, :refresh_token => access_grant.refresh_token, :expires_in => Devise.timeout_in.to_i}
   end
 
@@ -35,21 +35,16 @@ class AuthController < ApplicationController
   end
 
   def user
-    oauth_token = params[:oauth_token]
-    ag = AccessGrant.where(access_token: oauth_token).first
-    logger.info "AccessGrant: #{ag.inspect}"
-    render text: "Unauthorized", status: 401 and return unless ag.present?
-    account = ag.account
     
     hash = {
       :provider => 'kyck_auth',
-      :id => account.id.to_s,
+      :id => current_account.id.to_s,
       :info => {
-         :email      => account.email,
+         :email      => current_account.email,
       },
       :extra => {
-         :first_name => account.first_name,
-         :last_name  => account.last_name
+         :first_name => current_account.first_name,
+         :last_name  => current_account.last_name
       }
     }
     logger.info "** Rendering #{hash.inspect}"

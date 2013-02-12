@@ -4,10 +4,10 @@ class Account < ActiveRecord::Base
 
   before_validation :initialize_fields, :on => :create
 
-  devise :database_authenticatable,:recoverable, :validatable, :rememberable, :omniauthable
+  devise :database_authenticatable,:recoverable, :validatable, :rememberable, :omniauthable, :token_authenticatable, :omniauthable, :registerable
   # :trackable,:registerable, :token_authenticatable,:timeoutable,
 
-  #self.token_authentication_key = "kcyk_oauth_token"
+  self.token_authentication_key = "oauth_token"
 
   attr_accessible :email, :password, :password_confirmation, :remember_me, :first_name, :last_name
 
@@ -19,8 +19,13 @@ class Account < ActiveRecord::Base
     Rails.logger.info "****************BUICK"
     where(["access_grants.access_token = ? AND (access_grants.access_token_expires_at IS NULL OR access_grants.access_token_expires_at > ?)", conditions[token_authentication_key], Time.now]).joins(:access_grants).select("accounts.*").first
   end
-  
+
+  def full_name
+    [first_name, last_name].join(' ')
+  end
+  private
   def initialize_fields
+    return
     self.status = "Active"
     self.expiration_date = 1.year.from_now
   end

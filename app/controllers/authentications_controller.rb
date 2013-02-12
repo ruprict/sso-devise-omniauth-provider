@@ -1,5 +1,5 @@
 class AuthenticationsController < ApplicationController
-  before_filter :authenticate_user!, :except => [:create, :link, :add]
+  before_filter :authenticate_account!, :except => [:create, :link, :add]
 
   def index
     @authentications = current_account.authentications.all
@@ -15,6 +15,7 @@ class AuthenticationsController < ApplicationController
   end
 
   def add
+    Rails.logger.info "** #{params.inspect}"
     user = Account.find(params[:account_id])
     if user.valid_password?(params[:account][:password])
       omniauth = session[:omniauth]
@@ -38,13 +39,14 @@ class AuthenticationsController < ApplicationController
   # be linked.
   # (Gautam)
   def create
+    Rails.logger.info request.env['omniauth.auth']
     omniauth = request.env['omniauth.auth']
     authentication = Authentication.find_by_provider_and_uid(omniauth['provider'], omniauth['uid'])
     if authentication
       flash[:notice] = "Signed in successfully"
-      sign_in_and_redirect(:user, authentication.user)
+      sign_in_and_redirect(:account, authentication.account)
     else
-      user = User.new
+      user = Account.new(password: Devise.friendly_token) # If you create an account with twitter/fb, we don't need a passwod
       user.apply_omniauth(omniauth)
       user.email = omniauth['extra'] && omniauth['extra']['user_hash'] && omniauth['extra']['user_hash']['email']
       if user.save
@@ -60,7 +62,7 @@ class AuthenticationsController < ApplicationController
           user = Account.find_by_email(user.email)
           return redirect_to link_accounts_url(user.id)
         end
-        redirect_to new_user_registration_url
+        redirect_to new_account_registration_url
       end
     end
   end

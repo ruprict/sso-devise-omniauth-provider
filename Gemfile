@@ -15,7 +15,20 @@ gem 'jquery-rails'
 # gems for omniauth and devise
 gem 'devise'
 gem 'omniauth'
+gem 'omniauth-twitter'
 
-group :development do
+group :development, :test do
   gem 'pry-rails'
+  gem 'rspec-rails'
+  gem 'capybara'
+  gem 'webrat'
+end
+
+group :test do
+  gem 'cucumber-rails'
+  gem 'database_cleaner'
+  gem 'guard-rails'
+  gem 'guard-rspec'
+  gem 'guard-cucumber'
+  gem 'rb-fsevent'
 end

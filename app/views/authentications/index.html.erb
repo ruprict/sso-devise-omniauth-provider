@@ -1,0 +1,6 @@
+<ul>
+  <% @authentications.each do |auth| %>
+    <li><%= auth.provider %></li>  
+  <% end %>
+</ul>
+<%= link_to "Add", new_authentication_path %>

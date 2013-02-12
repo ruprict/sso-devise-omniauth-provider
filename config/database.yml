@@ -14,7 +14,7 @@ development:
   <<: *defaults
   database: kyck_development
 
-test:
+test: &test
   <<: *defaults
   database: kyck_test<%= ENV['TEST_ENV_NUMBER'] %>
 
@@ -23,3 +23,6 @@ production:
   database: kyck_production
 
 
+
+cucumber:
+  <<: *test
