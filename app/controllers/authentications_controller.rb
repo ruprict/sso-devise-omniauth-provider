@@ -39,7 +39,6 @@ class AuthenticationsController < ApplicationController
   # be linked.
   # (Gautam)
   def create
-    Rails.logger.info request.env['omniauth.auth']
     omniauth = request.env['omniauth.auth']
     authentication = Authentication.find_by_provider_and_uid(omniauth['provider'], omniauth['uid'])
     if authentication

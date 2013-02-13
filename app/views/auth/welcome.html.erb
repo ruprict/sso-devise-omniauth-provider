@@ -1,5 +1,6 @@
 <h1 id="">Welcome to KYCK Auth</h1>
 <p><%= current_account.full_name %></p>
+<p><%= current_account.id %></p>
 
 <% [:notice, :error].each do |key| %>
   <% if flash[key] %>

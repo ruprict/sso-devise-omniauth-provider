@@ -13,6 +13,5 @@ And /^provide my login information$/ do
 end
 
 Then /^I should be logged in$/ do
-  page.should have_content("Welcome")  
-  page.should have_content("Fred Flintstone")  
+  current_url.should == root_url
 end

@@ -3,7 +3,6 @@ class RegistrationsController < Devise::RegistrationsController
     # Building the resource with information that MAY BE available from omniauth!
     first_name, last_name = get_names
     @hide_password = session[:omniauth].present?
-    puts first_name
     build_resource(:first_name => first_name, :last_name => last_name, :email => session[:omniauth_email] )
     render :new
   end
@@ -38,6 +37,12 @@ class RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  def after_update_path_for(scope)
+    session[:referrer] ? session[:referrer] : root_path
+  end
+
+  private
+
   def build_resource(*args)
     super
 
@@ -47,11 +52,6 @@ class RegistrationsController < Devise::RegistrationsController
     end
   end
 
-  def after_update_path_for(scope)
-    session[:referrer] ? session[:referrer] : root_path
-  end
-
-  private
   def get_names
     return unless session[:omniauth] && session[:omniauth]['info'] && session[:omniauth]['info']['name']
     Rails.logger.info session[:omniauth]['info']['name']
