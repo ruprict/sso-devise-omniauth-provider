@@ -47,7 +47,7 @@ class AuthenticationsController < ApplicationController
     else
       user = Account.new(password: Devise.friendly_token) # If you create an account with twitter/fb, we don't need a passwod
       user.apply_omniauth(omniauth)
-      user.email = omniauth['extra'] && omniauth['extra']['user_hash'] && omniauth['extra']['user_hash']['email']
+      user.email = get_email_from_omniauth omniauth
       if user.save
         flash[:notice] = "Successfully registered"
         sign_in_and_redirect(:account, user)
@@ -79,5 +79,10 @@ class AuthenticationsController < ApplicationController
       format.html { redirect_to(authentications_url) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+  def get_email_from_omniauth omniauth
+    omniauth['extra'] && omniauth['extra']['raw_info'] && omniauth['extra']['raw_info']['email']
   end
 end

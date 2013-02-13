@@ -31,7 +31,7 @@ describe AuthenticationsController do
     obj.stub!(:user).and_return({})
     obj.stub!(:set_user).and_return({})
 
-    env = { "omniauth.auth" => { "provider" => "twitter", "uid" => "1234", "extra" => { "user_hash" => { "email" => "ghost@nobody.com" } } },
+    env = { "omniauth.auth" => { "provider" => "twitter", "uid" => "1234", "extra" => { "raw_info" => { "email" => "ghost@nobody.com" } } },
     "warden" => obj}
     @request.stub!(:env).and_return(env)
   end

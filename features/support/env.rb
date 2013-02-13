@@ -62,5 +62,16 @@ OmniAuth.config.test_mode = true
 OmniAuth.config.add_mock(:twitter, {
   uid: '12345',
   nickname: 'flintstone',
-  name: 'Bob Flintstone'
+  name: 'Fred Flintstone'
+})
+OmniAuth.config.add_mock(:facebook, {
+  uid: '12345',
+  nickname: 'flintstone',
+  extra: {
+    raw_info: {
+      email: 'fred@bedrockisp.com',
+      first_name: 'Fred',
+      last_name: 'Flintstone'
+    }
+  }
 })
